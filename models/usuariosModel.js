@@ -8,11 +8,17 @@ const Usuarios = db.define('usuarios', {
     primaryKey: true,
     autoIncrement: true
   },
+
   nombre: {
     type: Sequelize.STRING(60),
-    allowNull: false
+    allowNull: false,
+    validate: {
+      notEmpty: { msg: 'Debes capturar tu Nombre' }
+    }
   },
+
   imagen: Sequelize.STRING(60,),
+
   email: {
     type: Sequelize.STRING(30),
     allowNull: false,
@@ -24,13 +30,21 @@ const Usuarios = db.define('usuarios', {
       msg: 'Ese email ya está registrado'
     }
   },
+
+
+
   password: {
     type: Sequelize.STRING(60),
     allowNull: false,
     validate: {
-      notEmpty: { msg: 'El password no debe ir vacío' }
+      notEmpty: { msg: 'El password no debe ir vacío' },
+      len: {
+        args: [5, 8],
+        msg: 'El password debe de tener entre 5 y 8 caracteres'
+      }
     }
   },
+
   activo: {
     type: Sequelize.INTEGER,
     defaultValue: 0
@@ -43,7 +57,17 @@ const Usuarios = db.define('usuarios', {
   {
     hooks: {
       beforeCreate(usuario) {
+        if (usuario.email) {
+          usuario.email = usuario.email.toLowerCase();
+        }
+
         usuario.password = bcrypt.hashSync(usuario.password, bcrypt.genSaltSync(10), null);
+      },
+      
+      beforeUpdate(usuario) {
+        if (usuario.email) {
+          usuario.email = usuario.email.toLowerCase();
+        }
       }
     }
   }

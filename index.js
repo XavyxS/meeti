@@ -2,6 +2,10 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
 const bodyParser = require('body-parser');
+const flash = require('connect-flash');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const expressValidator = require('express-validator');
 const router = require('./routes/indexRoute.js');
 
 //Configuración y Modelos de Bases de Datos
@@ -30,8 +34,26 @@ app.set('views', path.join(__dirname, './views'));
 //Definir el directorio de Archivos Estáticos
 app.use(express.static('public'));
 
+//Habilitar cookie-paser
+app.use(cookieParser());
+
+//Habilitar Express-Validator (validación con múltiples funciones)
+app.use(expressValidator());
+
+// Crear la sesión
+app.use(session({
+  secret: process.env.SECRET,
+  key: process.env.KEY,
+  resave: false,
+  saveUninitialized: false
+}));
+
+// Agregar flash message
+app.use(flash());
+
 //Definiendo un Middleware propio para Usuario, fecha y mensajes
 app.use((req, res, next) => {
+  res.locals.mensajes = req.flash();
   const fecha = new Date();
   res.locals.year = fecha.getFullYear();
   next();
