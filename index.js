@@ -6,6 +6,7 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const expressValidator = require('express-validator');
+const passport = require('./config/passport.js');
 const router = require('./routes/indexRoute.js');
 
 //Configuración y Modelos de Bases de Datos
@@ -15,7 +16,6 @@ db.sync().then(() => console.log('DB Conectada')).catch((error) => console.log(e
 
 //Variables de Desarrollo
 require('dotenv').config({ path: '.env' });
-const port = process.env.PORT;
 
 //Aplicación Principal
 const app = express();
@@ -45,8 +45,16 @@ app.use(session({
   secret: process.env.SECRET,
   key: process.env.KEY,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    secure: false,              // Asegúrate de que esto sea `true` si usas HTTPS
+    maxAge: 1000 * 60 * 60 * 24 // Tiempo de expiración de la cookie en milisegundos (por ejemplo, 24 horas)
+  }
 }));
+
+//Inicializar Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Agregar flash message
 app.use(flash());
@@ -61,7 +69,9 @@ app.use((req, res, next) => {
 
 app.use('/', router());
 
+const port = process.env.PORT || 5000;
+const host = process.env.HOST || '0.0.0.0';
 
-app.listen(port, () => {
+app.listen(port, host, () => {
   console.log(`El Servidor está funcionando en el puerto: ${port}`);
 });

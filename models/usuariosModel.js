@@ -60,7 +60,6 @@ const Usuarios = db.define('usuarios', {
         if (usuario.email) {
           usuario.email = usuario.email.toLowerCase();
         }
-
         usuario.password = bcrypt.hashSync(usuario.password, bcrypt.genSaltSync(10), null);
       },
       
