@@ -12,7 +12,13 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
     acquire: 30000,
     idle: 10000
   },
-  logging: false
+  logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // Acepta certificados SSL auto-firmados
+    },
+  },
 });
 
 module.exports = sequelize;
